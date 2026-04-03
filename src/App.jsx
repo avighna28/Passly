@@ -17,7 +17,8 @@ import {
   Globe,
   Moon,
   Sun,
-  User
+  User,
+  Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
@@ -43,7 +44,23 @@ const Layout = ({ children, isDarkMode, toggleTheme }) => {
           </button>
         </div>
       </header>
-      {children}
+      <main>{children}</main>
+
+      <footer style={{ 
+        padding: '24px 0', 
+        textAlign: 'center', 
+        fontSize: '12px', 
+        color: 'var(--text-muted)',
+        borderTop: '1px solid var(--border-color)',
+        marginTop: 'auto',
+        background: 'var(--bg-color)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+          Made with <Heart size={14} fill="var(--primary-color)" color="var(--primary-color)" /> by 
+          <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>Avighna</span>
+        </div>
+      </footer>
     </div>
   );
 };
@@ -186,6 +203,11 @@ const GeneratorApp = ({ isDarkMode, toggleTheme }) => {
   const [photoName, setPhotoName] = useState('');
   const [photoDate, setPhotoDate] = useState(new Date().toISOString().split('T')[0]);
 
+  // Enhancements
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [smoothing, setSmoothing] = useState(0);
+
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -264,7 +286,12 @@ const GeneratorApp = ({ isDarkMode, toggleTheme }) => {
       canvas.height = 900;
       
       // Draw base image
+      // Apply Filters / Enhancements
+      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) blur(${smoothing * 0.5}px)`;
       ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
+      
+      // Reset filter for Name/Date or it will be blurry
+      ctx.filter = "none";
       
       // Add Name/Date Overlay if enabled
       if (addNameDate) {
@@ -548,7 +575,16 @@ const GeneratorApp = ({ isDarkMode, toggleTheme }) => {
                   position: 'relative',
                   border: '1px solid #ddd'
                 }}>
-                  <img src={image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="passport" />
+                  <img 
+                    src={image} 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      filter: `brightness(${brightness}%) contrast(${contrast}%) blur(${smoothing * 0.2}px)` // Real-time preview
+                    }} 
+                    alt="passport" 
+                  />
                   {addNameDate && (
                     <div style={{ 
                       position: 'absolute', 
